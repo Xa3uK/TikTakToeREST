@@ -1,9 +1,9 @@
-package com.koval.tiktaktoegame.controller.api
+package com.koval.tiktaktoegame.api.controller.spec
 
-import com.koval.tiktaktoegame.dto.request.RegisterRequest
-import com.koval.tiktaktoegame.dto.response.GameSummaryResponse
-import com.koval.tiktaktoegame.dto.response.PlayerResponse
-import com.koval.tiktaktoegame.exception.ErrorResponse
+import com.koval.tiktaktoegame.api.dto.request.RegisterRequest
+import com.koval.tiktaktoegame.api.dto.response.GameSummaryResponse
+import com.koval.tiktaktoegame.api.dto.response.PlayerResponse
+import com.koval.tiktaktoegame.api.exception.ErrorResponse
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.media.Content
 import io.swagger.v3.oas.annotations.media.Schema

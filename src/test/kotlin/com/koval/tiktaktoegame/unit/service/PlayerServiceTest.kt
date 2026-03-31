@@ -1,11 +1,11 @@
 package com.koval.tiktaktoegame.unit.service
 
-import com.koval.tiktaktoegame.domain.Player
-import com.koval.tiktaktoegame.dto.request.RegisterRequest
-import com.koval.tiktaktoegame.exception.AuthenticationException
-import com.koval.tiktaktoegame.exception.PlayerNotFoundException
-import com.koval.tiktaktoegame.repository.PlayerRepository
-import com.koval.tiktaktoegame.service.PlayerService
+import com.koval.tiktaktoegame.api.dto.request.RegisterRequest
+import com.koval.tiktaktoegame.domain.exception.AuthenticationException
+import com.koval.tiktaktoegame.domain.exception.PlayerNotFoundException
+import com.koval.tiktaktoegame.domain.model.Player
+import com.koval.tiktaktoegame.domain.repository.PlayerRepository
+import com.koval.tiktaktoegame.domain.service.PlayerService
 import io.mockk.every
 import io.mockk.mockk
 import org.assertj.core.api.Assertions.assertThat

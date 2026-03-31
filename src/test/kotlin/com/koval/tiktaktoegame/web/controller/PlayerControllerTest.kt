@@ -1,15 +1,14 @@
 package com.koval.tiktaktoegame.web.controller
 
-import tools.jackson.module.kotlin.jacksonObjectMapper
-import com.koval.tiktaktoegame.controller.PlayerController
-import com.koval.tiktaktoegame.domain.GameStatus
-import com.koval.tiktaktoegame.dto.request.RegisterRequest
-import com.koval.tiktaktoegame.dto.response.GameSummaryResponse
-import com.koval.tiktaktoegame.dto.response.PlayerResponse
-import com.koval.tiktaktoegame.exception.GlobalExceptionHandler
-import com.koval.tiktaktoegame.exception.PlayerNotFoundException
-import com.koval.tiktaktoegame.service.GameService
-import com.koval.tiktaktoegame.service.PlayerService
+import com.koval.tiktaktoegame.api.controller.PlayerController
+import com.koval.tiktaktoegame.api.dto.request.RegisterRequest
+import com.koval.tiktaktoegame.api.dto.response.GameSummaryResponse
+import com.koval.tiktaktoegame.api.dto.response.PlayerResponse
+import com.koval.tiktaktoegame.api.exception.GlobalExceptionHandler
+import com.koval.tiktaktoegame.domain.exception.PlayerNotFoundException
+import com.koval.tiktaktoegame.domain.model.GameStatus
+import com.koval.tiktaktoegame.domain.service.GameService
+import com.koval.tiktaktoegame.domain.service.PlayerService
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Test
@@ -18,6 +17,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import tools.jackson.module.kotlin.jacksonObjectMapper
 
 class PlayerControllerTest {
 

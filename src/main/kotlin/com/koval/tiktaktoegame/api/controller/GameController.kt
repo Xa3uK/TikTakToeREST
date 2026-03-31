@@ -1,10 +1,10 @@
-package com.koval.tiktaktoegame.controller
+package com.koval.tiktaktoegame.api.controller
 
-import com.koval.tiktaktoegame.controller.api.GameApi
-import com.koval.tiktaktoegame.dto.request.JoinGameRequest
-import com.koval.tiktaktoegame.dto.request.MakeMoveRequest
-import com.koval.tiktaktoegame.dto.response.GameResponse
-import com.koval.tiktaktoegame.service.GameService
+import com.koval.tiktaktoegame.api.controller.spec.GameApi
+import com.koval.tiktaktoegame.api.dto.request.JoinGameRequest
+import com.koval.tiktaktoegame.api.dto.request.MakeMoveRequest
+import com.koval.tiktaktoegame.api.dto.response.GameResponse
+import com.koval.tiktaktoegame.domain.service.GameService
 import org.springframework.web.bind.annotation.RestController
 
 @RestController

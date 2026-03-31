@@ -1,12 +1,12 @@
 package com.koval.tiktaktoegame.integration
 
-import com.koval.tiktaktoegame.domain.GameStatus
-import com.koval.tiktaktoegame.dto.request.JoinGameRequest
-import com.koval.tiktaktoegame.dto.request.MakeMoveRequest
-import com.koval.tiktaktoegame.dto.request.RegisterRequest
-import com.koval.tiktaktoegame.exception.InvalidMoveException
-import com.koval.tiktaktoegame.service.GameService
-import com.koval.tiktaktoegame.service.PlayerService
+import com.koval.tiktaktoegame.api.dto.request.JoinGameRequest
+import com.koval.tiktaktoegame.api.dto.request.MakeMoveRequest
+import com.koval.tiktaktoegame.api.dto.request.RegisterRequest
+import com.koval.tiktaktoegame.domain.exception.InvalidMoveException
+import com.koval.tiktaktoegame.domain.model.GameStatus
+import com.koval.tiktaktoegame.domain.service.GameService
+import com.koval.tiktaktoegame.domain.service.PlayerService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -46,7 +46,7 @@ class GameServiceIT : AbstractIT() {
 
         assertThat(response.status).isEqualTo(GameStatus.IN_PROGRESS)
         assertThat(response.yourSymbol).isEqualTo("O")
-        assertThat(response.yourTurn).isFalse() // X always moves first
+        assertThat(response.yourTurn).isFalse()
     }
 
     @Test
@@ -109,8 +109,7 @@ class GameServiceIT : AbstractIT() {
         val joined = gameService.joinGame(JoinGameRequest(bobId, "pass"))
         val gameId = joined.gameId
 
-        // Fill board to a draw: X O X / X X O / O X O
-        // Moves: (0,0)X (0,1)O (0,2)X (1,0)X (1,1)X (1,2)O (2,0)O (2,1)X (2,2)O
+        // X O X / X X O / O X O  → draw
         gameService.makeMove(gameId, MakeMoveRequest(aliceId, "pass", 0, 0))
         gameService.makeMove(gameId, MakeMoveRequest(bobId,   "pass", 0, 1))
         gameService.makeMove(gameId, MakeMoveRequest(aliceId, "pass", 0, 2))
@@ -153,7 +152,6 @@ class GameServiceIT : AbstractIT() {
     fun `player cannot join their own waiting game`() {
         gameService.joinGame(JoinGameRequest(aliceId, "pass"))
 
-        // Alice tries to join again — should create another WAITING game, not join her own
         val second = gameService.joinGame(JoinGameRequest(aliceId, "pass"))
         assertThat(second.status).isEqualTo(GameStatus.WAITING)
     }

@@ -1,9 +1,9 @@
 package com.koval.tiktaktoegame.integration
 
-import com.koval.tiktaktoegame.dto.request.RegisterRequest
-import com.koval.tiktaktoegame.exception.AuthenticationException
-import com.koval.tiktaktoegame.exception.PlayerNotFoundException
-import com.koval.tiktaktoegame.service.PlayerService
+import com.koval.tiktaktoegame.api.dto.request.RegisterRequest
+import com.koval.tiktaktoegame.domain.exception.AuthenticationException
+import com.koval.tiktaktoegame.domain.exception.PlayerNotFoundException
+import com.koval.tiktaktoegame.domain.service.PlayerService
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows

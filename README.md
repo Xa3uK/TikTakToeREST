@@ -149,15 +149,18 @@ Returns all games the player is assigned to, with status and opponent username.
 
 ```
 src/main/kotlin/com/koval/tiktaktoegame/
-├── controller/             # REST controllers
-│   └── api/                # Annotated interfaces (OpenAPI + Spring MVC)
-├── service/                # Business logic
-├── repository/             # Spring Data JDBC repositories
-├── domain/                 # Domain models (Game, Player, GameStatus)
-├── dto/
-│   ├── request/            # Request DTOs
-│   └── response/           # Response DTOs
-├── exception/              # Domain exceptions and global exception handler
+├── api/
+│   ├── controller/         # REST controllers
+│   │   └── spec/           # Annotated interfaces (OpenAPI + Spring MVC)
+│   ├── dto/
+│   │   ├── request/        # Request DTOs
+│   │   └── response/       # Response DTOs
+│   └── exception/          # Global exception handler and ErrorResponse
+├── domain/
+│   ├── model/              # Domain models (Game, Player, GameStatus)
+│   ├── service/            # Business logic
+│   ├── repository/         # Spring Data JDBC repositories
+│   └── exception/          # Domain exceptions
 └── config/                 # OpenAPI configuration
 src/main/resources/
 ├── application.yml

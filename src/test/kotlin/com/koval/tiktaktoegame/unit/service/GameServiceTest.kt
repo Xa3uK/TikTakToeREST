@@ -1,17 +1,17 @@
 package com.koval.tiktaktoegame.unit.service
 
-import com.koval.tiktaktoegame.domain.Game
-import com.koval.tiktaktoegame.domain.GameStatus
-import com.koval.tiktaktoegame.domain.Player
-import com.koval.tiktaktoegame.dto.request.JoinGameRequest
-import com.koval.tiktaktoegame.dto.request.MakeMoveRequest
-import com.koval.tiktaktoegame.exception.ConcurrentUpdateException
-import com.koval.tiktaktoegame.exception.GameNotFoundException
-import com.koval.tiktaktoegame.exception.InvalidMoveException
-import com.koval.tiktaktoegame.repository.GameRepository
-import com.koval.tiktaktoegame.repository.PlayerRepository
-import com.koval.tiktaktoegame.service.GameService
-import com.koval.tiktaktoegame.service.PlayerService
+import com.koval.tiktaktoegame.api.dto.request.JoinGameRequest
+import com.koval.tiktaktoegame.api.dto.request.MakeMoveRequest
+import com.koval.tiktaktoegame.domain.exception.ConcurrentUpdateException
+import com.koval.tiktaktoegame.domain.exception.GameNotFoundException
+import com.koval.tiktaktoegame.domain.exception.InvalidMoveException
+import com.koval.tiktaktoegame.domain.model.Game
+import com.koval.tiktaktoegame.domain.model.GameStatus
+import com.koval.tiktaktoegame.domain.model.Player
+import com.koval.tiktaktoegame.domain.repository.GameRepository
+import com.koval.tiktaktoegame.domain.repository.PlayerRepository
+import com.koval.tiktaktoegame.domain.service.GameService
+import com.koval.tiktaktoegame.domain.service.PlayerService
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
@@ -71,7 +71,7 @@ class GameServiceTest {
 
         assertThat(result.status).isEqualTo(GameStatus.IN_PROGRESS)
         assertThat(result.yourSymbol).isEqualTo("O")
-        assertThat(result.yourTurn).isFalse() // X always goes first
+        assertThat(result.yourTurn).isFalse()
     }
 
     @Test
@@ -186,7 +186,6 @@ class GameServiceTest {
 
     @Test
     fun `makeMove detects X win via diagonal`() {
-        // X at 0,4, plays (2,2)=index 8 → diagonal [0,4,8]
         every { playerService.authenticate(1L, "secret") } returns playerX
         every { gameRepository.findById(1L) } returns Optional.of(activeGame(board = "XO_OX____"))
         captureAndReturn()
@@ -199,8 +198,6 @@ class GameServiceTest {
 
     @Test
     fun `makeMove detects O win via middle row`() {
-        // O at 3,4, plays (1,2)=index 5 → row [3,4,5]
-        // Board: "_X_OO_X_X" — X:1,6,8 O:3,4 — O's turn
         every { playerService.authenticate(2L, "secret") } returns playerO
         every { gameRepository.findById(1L) } returns Optional.of(activeGame(board = "_X_OO_X_X", nextPlayerId = 2L))
         captureAndReturn()
@@ -213,8 +210,6 @@ class GameServiceTest {
 
     @Test
     fun `makeMove detects draw when board is full with no winner`() {
-        // Board "XOXOOX_XO" — X:0,2,5,7 O:1,3,4,8 — X's turn, plays (2,0)=index 6
-        // Result "XOXOOXXXO" — no winner, no empty cells → draw
         every { playerService.authenticate(1L, "secret") } returns playerX
         every { gameRepository.findById(1L) } returns Optional.of(activeGame(board = "XOXOOX_XO", nextPlayerId = 1L))
         captureAndReturn()
@@ -231,7 +226,6 @@ class GameServiceTest {
         every { gameRepository.findById(1L) } returns Optional.of(activeGame(board = "X________", nextPlayerId = 2L))
         captureAndReturn()
 
-        // O plays, then it becomes X's turn — O (requestingPlayer) is no longer to move
         val result = gameService.makeMove(1L, MakeMoveRequest(2L, "secret", 1, 1))
 
         assertThat(result.yourTurn).isFalse()

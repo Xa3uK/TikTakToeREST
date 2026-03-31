@@ -1,18 +1,17 @@
 package com.koval.tiktaktoegame.web.controller
 
-import tools.jackson.module.kotlin.jacksonObjectMapper
-import com.koval.tiktaktoegame.controller.GameController
-import com.koval.tiktaktoegame.domain.GameStatus
-import com.koval.tiktaktoegame.dto.request.JoinGameRequest
-import com.koval.tiktaktoegame.dto.request.MakeMoveRequest
-import com.koval.tiktaktoegame.dto.response.GameResponse
-import com.koval.tiktaktoegame.dto.response.MoveCoordinates
-import com.koval.tiktaktoegame.exception.AuthenticationException
-import com.koval.tiktaktoegame.exception.ConcurrentUpdateException
-import com.koval.tiktaktoegame.exception.GameNotFoundException
-import com.koval.tiktaktoegame.exception.GlobalExceptionHandler
-import com.koval.tiktaktoegame.exception.InvalidMoveException
-import com.koval.tiktaktoegame.service.GameService
+import com.koval.tiktaktoegame.api.controller.GameController
+import com.koval.tiktaktoegame.api.dto.request.JoinGameRequest
+import com.koval.tiktaktoegame.api.dto.request.MakeMoveRequest
+import com.koval.tiktaktoegame.api.dto.response.GameResponse
+import com.koval.tiktaktoegame.api.dto.response.MoveCoordinates
+import com.koval.tiktaktoegame.api.exception.GlobalExceptionHandler
+import com.koval.tiktaktoegame.domain.exception.AuthenticationException
+import com.koval.tiktaktoegame.domain.exception.ConcurrentUpdateException
+import com.koval.tiktaktoegame.domain.exception.GameNotFoundException
+import com.koval.tiktaktoegame.domain.exception.InvalidMoveException
+import com.koval.tiktaktoegame.domain.model.GameStatus
+import com.koval.tiktaktoegame.domain.service.GameService
 import io.mockk.every
 import io.mockk.mockk
 import org.junit.jupiter.api.Test
@@ -21,6 +20,7 @@ import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.get
 import org.springframework.test.web.servlet.post
 import org.springframework.test.web.servlet.setup.MockMvcBuilders
+import tools.jackson.module.kotlin.jacksonObjectMapper
 
 class GameControllerTest {
 
@@ -35,28 +35,18 @@ class GameControllerTest {
     private val emptyBoard = listOf("  |   |  ", "--+---+--", "  |   |  ", "--+---+--", "  |   |  ")
 
     private fun waitingGameResponse() = GameResponse(
-        gameId = 1L,
-        board = emptyBoard,
-        yourSymbol = "X",
-        yourTurn = false,
-        nextTurn = null,
-        status = GameStatus.WAITING,
-        winner = null,
-        availableMoves = null
+        gameId = 1L, board = emptyBoard,
+        yourSymbol = "X", yourTurn = false,
+        nextTurn = null, status = GameStatus.WAITING,
+        winner = null, availableMoves = null
     )
 
     private fun inProgressGameResponse(yourTurn: Boolean = true) = GameResponse(
-        gameId = 1L,
-        board = emptyBoard,
-        yourSymbol = "X",
-        yourTurn = yourTurn,
-        nextTurn = "X",
-        status = GameStatus.IN_PROGRESS,
-        winner = null,
-        availableMoves = if (yourTurn) List(9) { MoveCoordinates(it / 3, it % 3) } else null
+        gameId = 1L, board = emptyBoard,
+        yourSymbol = "X", yourTurn = yourTurn,
+        nextTurn = "X", status = GameStatus.IN_PROGRESS,
+        winner = null, availableMoves = if (yourTurn) List(9) { MoveCoordinates(it / 3, it % 3) } else null
     )
-
-    // --- POST /api/v1/games/join ---
 
     @Test
     fun `POST games join returns 200 with WAITING status when no match available`() {
@@ -119,8 +109,6 @@ class GameControllerTest {
         }
     }
 
-    // --- GET /api/v1/games/{gameId} ---
-
     @Test
     fun `GET games returns 200 with spectator view when no playerId provided`() {
         every { gameService.getGame(1L, null) } returns inProgressGameResponse().copy(
@@ -157,8 +145,6 @@ class GameControllerTest {
             jsonPath("$.error") { isNotEmpty() }
         }
     }
-
-    // --- POST /api/v1/games/{gameId}/moves ---
 
     @Test
     fun `POST games moves returns 200 after successful move`() {

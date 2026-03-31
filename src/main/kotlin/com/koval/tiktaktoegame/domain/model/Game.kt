@@ -1,4 +1,4 @@
-package com.koval.tiktaktoegame.domain
+package com.koval.tiktaktoegame.domain.model
 
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.Version

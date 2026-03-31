@@ -1,7 +1,6 @@
-package com.koval.tiktaktoegame.repository
+package com.koval.tiktaktoegame.domain.repository
 
-import com.koval.tiktaktoegame.domain.Game
-import com.koval.tiktaktoegame.domain.GameStatus
+import com.koval.tiktaktoegame.domain.model.Game
 import org.springframework.data.jdbc.repository.query.Query
 import org.springframework.data.repository.CrudRepository
 

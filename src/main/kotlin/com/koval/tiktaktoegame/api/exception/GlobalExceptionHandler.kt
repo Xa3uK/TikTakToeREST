@@ -1,5 +1,10 @@
-package com.koval.tiktaktoegame.exception
+package com.koval.tiktaktoegame.api.exception
 
+import com.koval.tiktaktoegame.domain.exception.AuthenticationException
+import com.koval.tiktaktoegame.domain.exception.ConcurrentUpdateException
+import com.koval.tiktaktoegame.domain.exception.GameNotFoundException
+import com.koval.tiktaktoegame.domain.exception.InvalidMoveException
+import com.koval.tiktaktoegame.domain.exception.PlayerNotFoundException
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.ExceptionHandler

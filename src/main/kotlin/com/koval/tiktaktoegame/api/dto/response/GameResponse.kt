@@ -1,6 +1,6 @@
-package com.koval.tiktaktoegame.dto.response
+package com.koval.tiktaktoegame.api.dto.response
 
-import com.koval.tiktaktoegame.domain.GameStatus
+import com.koval.tiktaktoegame.domain.model.GameStatus
 
 data class GameResponse(
     val gameId: Long,

@@ -1,11 +1,11 @@
-package com.koval.tiktaktoegame.service
+package com.koval.tiktaktoegame.domain.service
 
-import com.koval.tiktaktoegame.domain.Player
-import com.koval.tiktaktoegame.dto.request.RegisterRequest
-import com.koval.tiktaktoegame.dto.response.PlayerResponse
-import com.koval.tiktaktoegame.exception.AuthenticationException
-import com.koval.tiktaktoegame.exception.PlayerNotFoundException
-import com.koval.tiktaktoegame.repository.PlayerRepository
+import com.koval.tiktaktoegame.api.dto.request.RegisterRequest
+import com.koval.tiktaktoegame.api.dto.response.PlayerResponse
+import com.koval.tiktaktoegame.domain.exception.AuthenticationException
+import com.koval.tiktaktoegame.domain.exception.PlayerNotFoundException
+import com.koval.tiktaktoegame.domain.model.Player
+import com.koval.tiktaktoegame.domain.repository.PlayerRepository
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder
 import org.springframework.stereotype.Service
 

@@ -1,4 +1,4 @@
-package com.koval.tiktaktoegame.dto.response
+package com.koval.tiktaktoegame.api.dto.response
 
 data class PlayerResponse(
     val playerId: Long,

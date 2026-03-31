@@ -1,11 +1,11 @@
-package com.koval.tiktaktoegame.controller
+package com.koval.tiktaktoegame.api.controller
 
-import com.koval.tiktaktoegame.controller.api.PlayerApi
-import com.koval.tiktaktoegame.dto.request.RegisterRequest
-import com.koval.tiktaktoegame.dto.response.GameSummaryResponse
-import com.koval.tiktaktoegame.dto.response.PlayerResponse
-import com.koval.tiktaktoegame.service.GameService
-import com.koval.tiktaktoegame.service.PlayerService
+import com.koval.tiktaktoegame.api.controller.spec.PlayerApi
+import com.koval.tiktaktoegame.api.dto.request.RegisterRequest
+import com.koval.tiktaktoegame.api.dto.response.GameSummaryResponse
+import com.koval.tiktaktoegame.api.dto.response.PlayerResponse
+import com.koval.tiktaktoegame.domain.service.GameService
+import com.koval.tiktaktoegame.domain.service.PlayerService
 import org.springframework.web.bind.annotation.RestController
 
 @RestController
