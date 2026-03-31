@@ -12,19 +12,48 @@ A multiplayer Tic Tac Toe game over REST. Two players register, join matchmaking
 
 ## Running Locally
 
+### With Docker Compose
+
 **Prerequisites:** Docker
 
 ```bash
 docker compose up --build
 ```
 
+This starts two containers:
+
+- **db** — PostgreSQL 16 on port `5432`, database `tiktaktoe`, user `postgres`, password `postgres`. Data is persisted in a named volume `postgres_data`.
+- **app** — the Spring Boot application on port `8080`, built from the local `Dockerfile`. Waits for the database healthcheck before starting. Flyway migrations run automatically on startup.
+
 API docs and playground: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 
-To run without Docker, start PostgreSQL separately and configure `application.yml`, then:
+### Without Docker (local PostgreSQL)
+
+**Prerequisites:** PostgreSQL running locally.
+
+Create the database:
+
+```sql
+CREATE DATABASE tiktaktoe;
+```
+
+Update `src/main/resources/application.yml` with your connection details:
+
+```yaml
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/tiktaktoe
+    username: your_username
+    password: your_password
+```
+
+Then run the application:
 
 ```bash
 ./gradlew bootRun
 ```
+
+Flyway will apply all migrations automatically on startup.
 
 ## API Overview
 
@@ -116,6 +145,25 @@ Returns all games the player is assigned to, with status and opponent username.
 | `status` | `WAITING` / `IN_PROGRESS` / `FINISHED` |
 | `winner` | `"X"`, `"O"`, or `null` (draw) — present when `FINISHED` |
 
+## Project Structure
+
+```
+src/main/kotlin/com/koval/tiktaktoegame/
+├── controller/             # REST controllers
+│   └── api/                # Annotated interfaces (OpenAPI + Spring MVC)
+├── service/                # Business logic
+├── repository/             # Spring Data JDBC repositories
+├── domain/                 # Domain models (Game, Player, GameStatus)
+├── dto/
+│   ├── request/            # Request DTOs
+│   └── response/           # Response DTOs
+├── exception/              # Domain exceptions and global exception handler
+└── config/                 # OpenAPI configuration
+src/main/resources/
+├── application.yml
+└── db/migration/           # Flyway migrations
+```
+
 ## Authentication
 
 Each move request requires the player's ID and password. There are no sessions or tokens — credentials are verified per request using BCrypt.
@@ -135,23 +183,28 @@ All errors return `{"error": "<message>"}` with the appropriate HTTP status:
 | `404` | Player or game not found |
 | `409` | Invalid move, game not in progress, wrong turn, cell occupied, or concurrent update conflict |
 
-## Database
-
-Flyway migrations in `src/main/resources/db/migration/`:
-
-- `V1__create_tables.sql` — `players` and `games` tables
-- `V2__add_updated_at_trigger.sql` — PostgreSQL trigger to auto-update `updated_at`
-
 ## Tests
+
+Unit tests (no Docker required):
+
+```bash
+./gradlew test --tests "com.koval.tiktaktoegame.unit.*"
+```
+
+Web layer tests (no Docker required):
+
+```bash
+./gradlew test --tests "com.koval.tiktaktoegame.web.*"
+```
+
+Integration tests (requires Docker for Testcontainers):
+
+```bash
+./gradlew test --tests "com.koval.tiktaktoegame.integration.*"
+```
+
+Full test suite:
 
 ```bash
 ./gradlew test
 ```
-
-Three layers:
-
-| Layer | Location | What it tests |
-|-------|----------|---------------|
-| Unit | `unit/service/` | Service logic with MockK mocks — no Spring context |
-| Web | `web/controller/` | HTTP routes, status codes, JSON shape — MockMvc standaloneSetup |
-| Integration | `integration/` | Full stack against a real PostgreSQL (Testcontainers) |
