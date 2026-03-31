@@ -1,0 +1,16 @@
+spring:
+  application:
+    name: tik tak toe game
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/tiktaktoe
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+
+  flyway:
+    locations: classpath:db/migration
+
+  data:
+    jdbc:
+      dialect: postgresql
