@@ -18,8 +18,7 @@ A multiplayer Tic Tac Toe game over REST. Two players register, join matchmaking
 docker compose up --build
 ```
 
-The API is available at `http://localhost:8080`.
-Swagger UI: `http://localhost:8080/swagger-ui.html`
+API docs and playground: [http://localhost:8080/swagger-ui.html](http://localhost:8080/swagger-ui.html)
 
 To run without Docker, start PostgreSQL separately and configure `application.yml`, then:
 
@@ -44,36 +43,66 @@ To run without Docker, start PostgreSQL separately and configure `application.ym
 | `GET` | `/api/v1/games/{gameId}` | Get game state (add `?playerId=` for personal context) → 200 |
 | `POST` | `/api/v1/games/{gameId}/moves` | Make a move → 200 |
 
-### Example flow
+### Register a Player
 
-```bash
-# Register two players
-curl -X POST http://localhost:8080/api/v1/players \
-  -H 'Content-Type: application/json' \
-  -d '{"username": "alice", "password": "secret"}'
-# → {"playerId": 1, "username": "alice"}
-
-curl -X POST http://localhost:8080/api/v1/players \
-  -H 'Content-Type: application/json' \
-  -d '{"username": "bob", "password": "secret"}'
-# → {"playerId": 2, "username": "bob"}
-
-# Alice joins matchmaking → WAITING game created
-curl -X POST http://localhost:8080/api/v1/games/join \
-  -H 'Content-Type: application/json' \
-  -d '{"playerId": 1, "password": "secret"}'
-
-# Bob joins matchmaking → game transitions to IN_PROGRESS
-curl -X POST http://localhost:8080/api/v1/games/join \
-  -H 'Content-Type: application/json' \
-  -d '{"playerId": 2, "password": "secret"}'
-# → {"gameId": 1, "status": "IN_PROGRESS", "yourSymbol": "O", "yourTurn": false, ...}
-
-# Alice (X) makes the first move
-curl -X POST http://localhost:8080/api/v1/games/1/moves \
-  -H 'Content-Type: application/json' \
-  -d '{"playerId": 1, "password": "secret", "row": 0, "col": 0}'
 ```
+POST /api/v1/players
+Content-Type: application/json
+
+{
+  "username": "alice",
+  "password": "secret"
+}
+```
+
+Returns `201 Created` with the assigned `playerId`.
+
+### Join Matchmaking
+
+```
+POST /api/v1/games/join
+Content-Type: application/json
+
+{
+  "playerId": 1,
+  "password": "secret"
+}
+```
+
+If no waiting game is available, creates one with status `WAITING`. Otherwise joins an existing game and transitions it to `IN_PROGRESS`. X always moves first.
+
+### Get Game State
+
+```
+GET /api/v1/games/{gameId}
+GET /api/v1/games/{gameId}?playerId={playerId}
+```
+
+Without `playerId` returns a spectator view (no `yourSymbol`, `yourTurn`, or `availableMoves`). With `playerId` returns personal context including available moves when it is your turn.
+
+### Make a Move
+
+```
+POST /api/v1/games/{gameId}/moves
+Content-Type: application/json
+
+{
+  "playerId": 1,
+  "password": "secret",
+  "row": 0,
+  "col": 2
+}
+```
+
+`row` and `col` are zero-based (0–2). Returns the updated game state. Returns `409` if the move is invalid (wrong turn, cell occupied, game not in progress) or if a concurrent update conflict occurred — retry in that case.
+
+### List Player Games
+
+```
+GET /api/v1/players/{playerId}/games
+```
+
+Returns all games the player is assigned to, with status and opponent username.
 
 ### Game response fields
 
