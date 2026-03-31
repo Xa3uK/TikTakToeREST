@@ -1,4 +1,4 @@
-package com.koval.tiktaktoegame.service
+package com.koval.tiktaktoegame.unit.service
 
 import com.koval.tiktaktoegame.domain.Game
 import com.koval.tiktaktoegame.domain.GameStatus
@@ -10,6 +10,8 @@ import com.koval.tiktaktoegame.exception.GameNotFoundException
 import com.koval.tiktaktoegame.exception.InvalidMoveException
 import com.koval.tiktaktoegame.repository.GameRepository
 import com.koval.tiktaktoegame.repository.PlayerRepository
+import com.koval.tiktaktoegame.service.GameService
+import com.koval.tiktaktoegame.service.PlayerService
 import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
