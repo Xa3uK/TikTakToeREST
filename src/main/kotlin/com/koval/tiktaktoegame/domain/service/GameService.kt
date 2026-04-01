@@ -12,6 +12,7 @@ import com.koval.tiktaktoegame.domain.model.Game
 import com.koval.tiktaktoegame.domain.model.GameStatus
 import com.koval.tiktaktoegame.domain.repository.GameRepository
 import com.koval.tiktaktoegame.domain.repository.PlayerRepository
+import org.slf4j.LoggerFactory
 import org.springframework.dao.OptimisticLockingFailureException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -23,14 +24,18 @@ class GameService(
     private val playerService: PlayerService
 ) {
 
+    private val logger = LoggerFactory.getLogger(GameService::class.java)
+
     @Transactional
     fun joinGame(request: JoinGameRequest): GameResponse {
+        logger.info("Player id={} attempting to join a game", request.playerId)
         val player = playerService.authenticate(request.playerId, request.password)
         val playerId = requireNotNull(player.id) { "Player id must not be null after authentication" }
 
         val existingGame = gameRepository.findFirstWaitingGameNotOwnedBy(playerId)
         val game = try {
             if (existingGame != null) {
+                logger.info("Player id={} joining existing game id={}", playerId, existingGame.id)
                 gameRepository.save(
                     existingGame.copy(
                         playerOId = playerId,
@@ -39,21 +44,26 @@ class GameService(
                     )
                 )
             } else {
+                logger.info("No waiting game found; creating new game for player id={}", playerId)
                 gameRepository.save(Game(playerXId = playerId))
             }
         } catch (ex: OptimisticLockingFailureException) {
+            logger.warn("Concurrent update conflict for player id={} during joinGame", playerId)
             throw ConcurrentUpdateException()
         }
 
+        logger.info("Player id={} joined game id={} with status={}", playerId, game.id, game.status)
         return toGameResponse(game, requestingPlayerId = playerId)
     }
 
     fun getGame(gameId: Long, requestingPlayerId: Long?): GameResponse {
+        logger.debug("Fetching game id={} for player id={}", gameId, requestingPlayerId)
         val game = gameRepository.findById(gameId).orElseThrow { GameNotFoundException(gameId) }
         return toGameResponse(game, requestingPlayerId)
     }
 
     fun getGamesForPlayer(playerId: Long): List<GameSummaryResponse> {
+        logger.debug("Fetching all games for player id={}", playerId)
         val games = gameRepository.findAllByPlayerId(playerId)
         val playerIds = games.flatMap { listOfNotNull(it.playerXId, it.playerOId) }.toSet()
         val players = playerRepository.findAllById(playerIds).associateBy { it.id }
@@ -70,27 +80,33 @@ class GameService(
 
     @Transactional
     fun makeMove(gameId: Long, request: MakeMoveRequest): GameResponse {
+        logger.info("Player id={} making move at ({},{}) in game id={}", request.playerId, request.row, request.col, gameId)
         val player = playerService.authenticate(request.playerId, request.password)
         val playerId = requireNotNull(player.id) { "Player id must not be null after authentication" }
 
         if (request.row !in 0..2 || request.col !in 0..2) {
+            logger.warn("Invalid move coordinates ({},{}) from player id={}", request.row, request.col, playerId)
             throw InvalidMoveException("Row and col must be between 0 and 2")
         }
 
         val game = gameRepository.findById(gameId).orElseThrow { GameNotFoundException(gameId) }
 
         if (playerId != game.playerXId && playerId != game.playerOId) {
+            logger.warn("Player id={} is not part of game id={}", playerId, gameId)
             throw InvalidMoveException("Player is not part of this game")
         }
         if (game.status != GameStatus.IN_PROGRESS) {
+            logger.warn("Move rejected: game id={} status is {}", gameId, game.status)
             throw InvalidMoveException("Game is not in progress")
         }
         if (game.nextPlayerId != playerId) {
+            logger.warn("Move rejected: it is not player id={}'s turn in game id={}", playerId, gameId)
             throw InvalidMoveException("It is not your turn")
         }
 
         val index = request.row * 3 + request.col
         if (game.board[index] != '_') {
+            logger.warn("Move rejected: cell ({},{}) already occupied in game id={}", request.row, request.col, gameId)
             throw InvalidMoveException("Cell (${request.row}, ${request.col}) is already occupied")
         }
 
@@ -121,9 +137,11 @@ class GameService(
         val savedGame = try {
             gameRepository.save(updatedGame)
         } catch (ex: OptimisticLockingFailureException) {
+            logger.warn("Concurrent update conflict for player id={} in game id={}", playerId, gameId)
             throw ConcurrentUpdateException()
         }
 
+        logger.info("Move saved: game id={} status={} winnerId={}", savedGame.id, savedGame.status, savedGame.winnerId)
         return toGameResponse(savedGame, requestingPlayerId = playerId)
     }
 
